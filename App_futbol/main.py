@@ -1,25 +1,22 @@
 from Usuarios import Jugador
 from cancha import Partido
-from Seguridad import SistemaSeguridad, generar_ranking_top
+from Seguridad import SistemaSeguridad, Reporte
 
-# 1. El dueño abre un partido a las 9 PM para 2 personas (prueba rápida)
-partido_9pm = Partido("21:00", 2)
+# 1. El dueño crea el evento
+partido_noche = Partido("20:00", 10)
 
-# 2. Llegan 3 amigos
-j1 = Jugador("Andres", 22, "A")
-j2 = Jugador("Socio", 23, "A")
-j3 = Jugador("Rival", 24, "B")
+# 2. Se inscriben los jugadores
+andres = Jugador("Andres", 22, "A")
+rival = Jugador("Rival", 25, "B")
+partido_noche.inscribir_jugador(andres)
+partido_noche.inscribir_jugador(rival)
 
-for j in [j1, j2, j3]:
-    print(partido_9pm.inscribir_jugador(j))
+# 3. Sucede un problema y alguien reporta
+# (Emisor, Receptor, Categoría, Gravedad, Comentario)
+nuevo_reporte = Reporte(rival, andres, "No_Pago", 5, "Se fue sin pagar su parte de la cancha")
 
-# 3. Simulación de conflicto: El rival reporta falsamente a Andres
-print("\n--- Incidente en la cancha ---")
-reporte = SistemaSeguridad.procesar_reporte(j3, j1, "Insultos", 5, False)
-print(reporte)
+# 4. El Administrador (tu amigo) revisa y ejecuta
+print(SistemaSeguridad.ejecutar_veredicto(nuevo_reporte, es_real=True))
 
-# 4. Ver Ranking Final
-print("\n--- Ranking de la App ---")
-top = generar_ranking_top(partido_9pm.obtener_todos())
-for i, p in enumerate(top, 1):
-    print(f"{i}. {p}")
+# 5. Ver cómo quedó el ranking
+print(f"Nuevo ranking de {andres.nombre}: {andres.ranking}")
