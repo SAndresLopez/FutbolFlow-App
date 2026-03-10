@@ -1,0 +1,10 @@
+<<<<<<< HEAD
+.idea
+__pycache__/  
+*.pyc  
+.env  
+=======
+.idea/
+__pycache__/
+*.pyc
+>>>>>>> 10f9c0c0a24bdc4f07305fa551769f0bfe10be85
