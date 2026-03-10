@@ -6,7 +6,7 @@ class Partido:
         self.suplentes = []
 
     def inscribir_jugador(self, jugador):
-        if len(self.titulares) < self.capacidad:
+        if len(self.titulares) <= self.capacidad:
             jugador.es_titular = True
             # Por defecto, al inscribirse como titular, debe pagar
             jugador.esta_pagado = False
