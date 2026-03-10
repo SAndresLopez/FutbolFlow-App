@@ -9,7 +9,7 @@ class Jugador:
         self.reportes_recibidos = []
 
     def __str__(self):
-        estado = "Titular" if self.es_titular else "Suplente"
+        rol = "Titular" if self.es_titular else "Suplente"
         pago = "Pagado" if self.esta_pagado else "Pendiente"
-        return f"[{self.equipo}] {self.nombre} - {self.ranking} ({estado}/{pago})"
+        return f"[{self.equipo}] {self.nombre}, {self.ranking:.1f}, {rol}, {pago}"
 

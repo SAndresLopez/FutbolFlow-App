@@ -1,18 +1,25 @@
-from usuarios import Jugador
-from cancha import AdministradorCanchas
-from seguridad import SistemaSeguridad
+from Usuarios import Jugador
+from cancha import Partido
+from Seguridad import SistemaSeguridad, generar_ranking_top
 
-# 1. El dueño avisa disponibilidad
-mi_complejo = AdministradorCanchas("Canchas El Pibe")
-mi_complejo.habilitar_horario("20:00", 10) # 10 jugadores para las 8 PM
+# 1. El dueño abre un partido a las 9 PM para 2 personas (prueba rápida)
+partido_9pm = Partido("21:00", 2)
 
-# 2. Se registran jugadores
-prospecto = Jugador("Andres", 22, "A")
-partido_8pm = mi_complejo.horarios_disponibles["20:00"]
-print(partido_8pm.agregar_jugador(prospecto))
+# 2. Llegan 3 amigos
+j1 = Jugador("Andres", 22, "A")
+j2 = Jugador("Socio", 23, "A")
+j3 = Jugador("Rival", 24, "B")
 
-# 3. Prueba de seguridad (Reporte falso)
-troll = Jugador("User123", 19, "B")
-resultado = SistemaSeguridad.procesar_reporte(troll, prospecto, "Insultos", 5, False)
-print(resultado)
-print(f"Ranking del troll ahora: {troll.ranking}")
+for j in [j1, j2, j3]:
+    print(partido_9pm.inscribir_jugador(j))
+
+# 3. Simulación de conflicto: El rival reporta falsamente a Andres
+print("\n--- Incidente en la cancha ---")
+reporte = SistemaSeguridad.procesar_reporte(j3, j1, "Insultos", 5, False)
+print(reporte)
+
+# 4. Ver Ranking Final
+print("\n--- Ranking de la App ---")
+top = generar_ranking_top(partido_9pm.obtener_todos())
+for i, p in enumerate(top, 1):
+    print(f"{i}. {p}")
