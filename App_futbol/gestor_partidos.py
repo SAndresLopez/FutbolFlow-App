@@ -1,25 +1,26 @@
-from Usuarios import Jugador
+
 from conexion_db import crear_conexion
 
 
 class GestorPartidos:
     @staticmethod
-    def crear_partido(id_cancha, fecha, hora, capacidad=10):
-        """Crea un nuevo evento de partido en la base de datos"""
+    def crear_partido(fecha, hora, lugar, precio):
+        """Función exclusiva para el Administrador"""
+        from conexion_db import crear_conexion
         conexion = crear_conexion()
         if not conexion: return
 
         try:
             cursor = conexion.cursor()
-            sql = """
-                    INSERT INTO partidos (id_cancha, fecha, hora_inicio, capacidad_max, estado) 
-                    VALUES (%s, %s, %s, %s, 'Abierto')
-                """
-            cursor.execute(sql, (id_cancha, fecha, hora, capacidad))
+            # El estado por defecto es 'Abierto'
+            sql = "INSERT INTO partidos (fecha, hora, lugar, precio, estado) VALUES (%s, %s, %s, %s, 'Abierto')"
+            cursor.execute(sql, (fecha, hora, lugar, precio))
             conexion.commit()
-            print(f"¡Partido creado con éxito! ID del evento: {cursor.lastrowid}")
+
+            print(f"\n¡NUEVA CONVOCATORIA CREADA!")
+            print(f"Lugar: {lugar} |  {fecha} a las {hora} |  Precio: {precio}")
         except Exception as e:
-            print(f"Error al crear el partido: {e}")
+            print(f"Error al crear el evento: {e}")
         finally:
             conexion.close()
 
@@ -125,33 +126,34 @@ class GestorPartidos:
 
     @staticmethod
     def unirse_a_posicion(id_jugador, id_partido, equipo, posicion):
-        """El jugador elige su lugar exacto en el campo"""
+        from conexion_db import crear_conexion
         conexion = crear_conexion()
-        if not conexion: return
+        if not conexion: return False
 
         try:
             cursor = conexion.cursor(dictionary=True)
 
-            sql_check = """
-                        SELECT COUNT(*) as ocupado FROM inscripciones 
-                        WHERE id_partido = %s AND equipo_asignado = %s AND posicion = %s
-                    """
-            cursor.execute(sql_check, (id_partido, equipo, posicion))
-            if cursor.fetchone()['ocupado'] > 0:
-                print(f"¡Error! La posición de '{posicion}' en el Equipo {equipo} ya está tomada.")
-                return
+            cursor.execute("SELECT COUNT(*) as total FROM inscripciones WHERE id_partido = %s", (id_partido,))
+            conteo = cursor.fetchone()['total']
 
-            # 2. INSCRIPCIÓN: Si está libre, lo registramos
-            sql_insert = """
-                        INSERT INTO inscripciones (id_partido, id_jugador, equipo_asignado, posicion) 
-                        VALUES (%s, %s, %s, %s)
-                    """
-            cursor.execute(sql_insert, (id_partido, id_jugador, equipo, posicion))
+            limite_cupos = 12
+
+            if conteo >= limite_cupos:
+                print(f"\n¡LO SIENTO! El partido ya está lleno ({conteo}/{limite_cupos}).")
+                return False
+
+            sql_pos = "SELECT * FROM inscripciones WHERE id_partido = %s AND equipo_asignado = %s AND posicion = %s"
+            cursor.execute(sql_pos, (id_partido, equipo, posicion))
+            if cursor.fetchone():
+                print(f"La posición {posicion} en el Equipo {equipo} ya está tomada.")
+                return False
+
+            sql_ins = "INSERT INTO inscripciones (id_jugador, id_partido, equipo_asignado, posicion) VALUES (%s, %s, %s, %s)"
+            cursor.execute(sql_ins, (id_jugador, id_partido, equipo, posicion))
             conexion.commit()
-            print(f"¡Confirmado! Eres el nuevo '{posicion}' del Equipo {equipo}.")
+            print(f"¡Inscripción exitosa! Te vemos en la cancha como {posicion}.")
+            return True
 
-        except Exception as e:
-            print(f"Error en la formación: {e}")
         finally:
             conexion.close()
 
@@ -195,48 +197,6 @@ class GestorPartidos:
             conexion.close()
 
     @staticmethod
-    def calificar_partido(id_partido):
-        """Permite poner nota a todos los que asistieron al evento"""
-        conexion = crear_conexion()
-        if not conexion: return
-
-        try:
-            cursor = conexion.cursor(dictionary=True)
-            # Traemos a los jugadores que estuvieron en ese partido
-            sql = """
-                    SELECT j.id_jugador, j.nombre, i.posicion 
-                    FROM inscripciones i 
-                    JOIN jugadores j ON i.id_jugador = j.id_jugador 
-                    WHERE i.id_partido = %s
-                """
-            cursor.execute(sql, (id_partido,))
-            convocados = cursor.fetchall()
-
-            print(f"\n--- CALIFICANDO PARTIDO {id_partido} ---")
-            print("(Escala de 1.0 a 5.0 estrellas)")
-
-            for j in convocados:
-                while True:
-                    try:
-                        nota = float(input(f"Nota para {j['nombre']} ({j['posicion']}): "))
-                        if 1.0 <= nota <= 5.0:
-                            break
-                        else:
-                            print("La nota debe estar entre 1.0 y 5.0")
-                    except ValueError:
-                        print("Ingresa un número válido.")
-
-                Jugador.actualizar_ranking(j['id_jugador'], nota)
-
-            # Cerramos el partido para que ya no aparezca como disponible
-            cursor.execute("UPDATE partidos SET estado = 'Finalizado' WHERE id_partido = %s", (id_partido,))
-            conexion.commit()
-            print("\nPartido finalizado y jugadores calificados.")
-
-        finally:
-            conexion.close()
-
-    @staticmethod
     def registrar_pago(id_jugador, id_partido):
         """Marca la inscripción de un jugador como pagada"""
         from conexion_db import crear_conexion
@@ -253,5 +213,54 @@ class GestorPartidos:
                 print(f"¡Pago confirmado para el jugador {id_jugador}!")
             else:
                 print("No se encontró la inscripción para este pago.")
+        finally:
+            conexion.close()
+
+    @staticmethod
+    def generar_reporte_caja(id_partido):
+        """Muestra el estado financiero de un partido específico"""
+        from conexion_db import crear_conexion
+        conexion = crear_conexion()
+        if not conexion: return False
+
+        try:
+            cursor = conexion.cursor(dictionary=True)
+
+            # 1. Traemos datos del partido (Precio y Lugar)
+            cursor.execute("SELECT lugar, precio FROM partidos WHERE id_partido = %s", (id_partido,))
+            partido = cursor.fetchone()
+
+            if not partido:
+                print("El partido no existe.")
+                return False
+
+            precio_cuota = partido['precio']
+
+            # 2. Contamos cuántos han pagado y cuántos faltan
+            sql_stats = """
+                    SELECT 
+                        COUNT(*) as total_inscritos,
+                        SUM(CASE WHEN pagado = 1 THEN 1 ELSE 0 END) as han_pagado,
+                        SUM(CASE WHEN pagado = 0 THEN 1 ELSE 0 END) as morosos
+                    FROM inscripciones WHERE id_partido = %s
+                """
+            cursor.execute(sql_stats, (id_partido,))
+            stats = cursor.fetchone()
+
+            total_recaudado = stats['han_pagado'] * precio_cuota
+            total_pendiente = stats['morosos'] * precio_cuota
+
+            # --- DISEÑO DEL REPORTE ---
+            print("\n" + "💵" + "—" * 35 + "💵")
+            print(f"      REPORTE DE CAJA - ID: {id_partido}")
+            print(f"      📍 {partido['lugar']}")
+            print("—" * 39)
+            print(f"✅ PAGADOS:    {stats['han_pagado']} jugadores  -> S/. {total_recaudado:.2f}")
+            print(f"❌ DEUDORES:   {stats['morosos']} jugadores  -> S/. {total_pendiente:.2f}")
+            print("—" * 39)
+            print(f"TOTAL EN CAJA ACTUAL:      S/. {total_recaudado:.2f}")
+            print(f"TOTAL ESPERADO (FULL):     S/. {total_recaudado + total_pendiente:.2f}")
+            print("—" * 39)
+
         finally:
             conexion.close()

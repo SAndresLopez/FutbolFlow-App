@@ -1,11 +1,12 @@
 from conexion_db import crear_conexion
 
 class Jugador:
-    def __init__(self, nombre, edad, email, equipo,id_jugador=None, ranking=5.0):
+    def __init__(self, nombre, edad, email, equipo,id_jugador=None, ranking=5.0, es_admin=False):
         self.id_jugador = id_jugador
         self.nombre = nombre
         self.edad = edad
         self.email = email
+        self.es_admin = es_admin
         self.equipo = equipo  # "A" o "B"
         self.ranking = 5.0    # Puntaje inicial
         self.esta_pagado = False

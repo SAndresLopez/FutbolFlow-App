@@ -38,6 +38,12 @@ def menu_principal(usuario):
         print("3. Inscribirme a un Partido")
         print("4. MI PERFIL (Estadísticas)")
         print("5. RANKING GLOBAL (Top 10)")
+        if usuario.es_admin:
+            print("\n--- HERRAMIENTAS DE JEFE ---")
+            print("6. CREAR NUEVO PARTIDO")
+            print("7. CALIFICAR JUGADORES (Ranking)")
+            print("8. REGISTRAR PAGOS")
+            print("9. REPORTE DE CAJA")
         print("0. Salir")
 
         opcion = input("\nSelecciona una opción: ")
@@ -71,9 +77,24 @@ def menu_principal(usuario):
         elif opcion == "5":
             Jugador.ver_top_jugadores()
 
+        elif opcion == "6" and usuario.es_admin:
+            pass
+
+        elif opcion == "7" and usuario.es_admin:
+            pass
+
+        elif opcion == "8" and usuario.es_admin:
+            pass
+
+        elif opcion == "9" and usuario.es_admin:
+            id_p = int(input("ID del partido para ver finanzas: "))
+            GestorPartidos.generar_reporte_caja(id_p)
+
         elif opcion == "0":
             print("¡Nos vemos en los vestuarios!")
             break
+        else:
+            print("Opción no válida o no tienes permisos.")
 
 
 if __name__ == "__main__":
