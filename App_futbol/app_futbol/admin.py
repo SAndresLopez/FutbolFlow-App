@@ -4,7 +4,7 @@ from .models import Partido, PerfilJugador
 # Configuración pro para la lista de Partidos
 class PartidoAdmin(admin.ModelAdmin):
     # Esto crea las columnas en la tabla
-    list_display = ('lugar', 'fecha', 'precio', 'cupos_disponibles')
+    list_display = ('lugar', 'fecha', 'precio', 'cupos_restantes')
     # Esto agrega un buscador por lugar
     search_fields = ('lugar',)
     # Esto agrega filtros a la derecha

@@ -7,20 +7,21 @@ class Partido(models.Model):
     lugar = models.CharField(max_length=100)
     fecha = models.DateTimeField()
     precio = models.DecimalField(max_digits=10, decimal_places=2)
-    cupos_disponibles = models.IntegerField(default=12)
+    cupos_inscritos = models.IntegerField(default=0)
     cupos_max = models.IntegerField(default=12)
+
 
     def __str__(self):
         return f"{self.lugar} - {self.fecha.strftime('%d/%m/%Y')}"
 
     @property
-    def cupos_ocupados(self):
-        return self.cupos_max - self.cupos_disponibles
+    def cupos_restantes(self):
+        return self.cupos_max - self.cupos_cupos_inscritos
 
     @property
     def porcentaje_llenado(self):
         if self.cupos_max > 0:
-            porcentaje = (self.cupos_ocupados / self.cupos_max) * 100
+            porcentaje = (self.cupos_inscritos / self.cupos_max) * 100
             return min(porcentaje, 100)
         return 0
 
@@ -28,10 +29,7 @@ class Partido(models.Model):
 from django.contrib.auth.models import User
 
 class PerfilJugador(models.Model):
-    # Esto vincula el perfil con el usuario de Django
     usuario = models.OneToOneField(User, on_delete=models.CASCADE)
-
-    # Tus campos personalizados
     posicion = models.CharField(max_length=50, choices=[
         ('Portero', 'Portero'),
         ('Defensa', 'Defensa'),
@@ -47,3 +45,11 @@ class PerfilJugador(models.Model):
 
     def __str__(self):
         return f"{self.usuario.username} - {self.posicion}"
+
+class Inscripcion(models.Model):
+    partido = models.ForeignKey(Partido, on_delete=models.CASCADE, related_name='inscripciones')
+    nombre_jugador = models.CharField(max_length=100)
+    fecha_inscripcion = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.nombre_jugador} en {self.partido.nombre_encuentro}"

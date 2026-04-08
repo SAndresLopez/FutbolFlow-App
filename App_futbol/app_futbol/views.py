@@ -1,5 +1,6 @@
 from django.shortcuts import render
-from .models import Partido
+from django.shortcuts import redirect, get_object_or_404
+from .models import Partido, Inscripcion
 
 
 def home(request):
@@ -11,3 +12,10 @@ def home(request):
         partidos = partidos.filter(lugar__icontains=distrito_filtrado)
 
     return render(request, 'home.html', {'partidos': partidos})
+
+def unirse_partido(request, partido_id):
+    partido = get_object_or_404(Partido, id=partido_id)
+    if partido.cupos_inscritos < partido.cupos_max:
+        partido.cupos_inscritos += 1
+        partido.save()
+    return redirect('home')
