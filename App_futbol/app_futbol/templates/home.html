@@ -1,0 +1,299 @@
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700;800;900&display=swap" rel="stylesheet">
+
+<div class="seccion-partidos">
+
+    <h1 class="titulo-principal">PARTIDOS <span class="destacado">DISPONIBLES</span></h1>
+    <p class="subtitulo">Únete a la pichanga y demuestra tu nivel</p>
+<div class="filter-section">
+    <form method="GET" action="{% url 'home' %}" class="filter-form">
+        <label for="distrito">Filtrar por zona:</label>
+        <select name="distrito" id="distrito" onchange="this.form.submit()">
+            <option value="">Todos los distritos</option>
+            <option value="MIRAFLORES" {% if request.GET.distrito == "MIRAFLORES" %}selected{% endif %}>Miraflores</option>
+            <option value="SURQUILLO" {% if request.GET.distrito == "SURQUILLO" %}selected{% endif %}>Surquillo</option>
+        </select>
+        <a href="{% url 'home' %}" class="btn-clear">Limpiar</a>
+    </form>
+</div>
+<div class="match-grid">
+  {% for partido in partidos %}
+    <div class="match-card">
+        <div class="match-image" style="background-image: url('https://images.unsplash.com/photo-1574629810360-7efbbe195018?q=80&w=500');">
+            <div class="status-badge">Disponible</div>
+        </div>
+
+        <div class="match-body">
+            <div class="match-info">
+                <h3>{{ partido.nombre_encuentro }}</h3>
+                <p class="location"><i class="fas fa-map-marker-alt"></i> {{ partido.lugar }}</p>
+                <p><i class="far fa-calendar-alt"></i> {{ partido.fecha|date:"d M, Y" }}</p>
+
+                <div class="slots-container">
+                    <div class="slots-text">
+                        <span class="count-badge">
+                            <i class="fas fa-users"></i>
+                            <strong>{{ partido.cupos_ocupados }}</strong>/{{ partido.cupos_disponibles }} Jugadores
+                        </span>
+                    </div>
+
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: {{ partido.porcentaje_llenado }}%;"></div>
+                    </div>
+
+                    {% if partido.cupos_disponibles <= 3 and partido.cupos_disponibles > 0 %}
+                        <span class="urgent">¡Casi lleno!</span>
+                    {% elif partido.cupos_disponibles == 0 %}
+                        <span class="full">¡Completo!</span>
+                    {% endif %}
+                </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: {{ partido.porcentaje_llenado }}%;"></div>
+                    </div>
+            </div>
+            <div class="match-action">
+                <span class="price">S/ {{ partido.precio }}</span>
+                <button class="btn-book">
+                    {% if partido.cupos_disponibles == 0 %}Lleno{% else %}Unirme{% endif %}
+                </button>
+            </div>
+        </div> </div> {% empty %}
+        <p class="no-matches">No hay partidos creados todavía.</p>
+    {% endfor %}
+</div>
+    <style>
+    body {
+        background-color: #1a1a1a;
+        background-image:
+            linear-gradient(135deg, rgba(0, 31, 63, 0.9) 0%, rgba(10, 10, 10, 0.95) 100%),
+            url('https://images.unsplash.com/photo-1518604666860-9ed391f76460?q=80&w=2070');
+        background-size: cover;
+        background-attachment: fixed;
+        background-position: center;
+        color: #333;
+    }
+    .header-container,
+    .filter-section {
+        background: #ffffff; /* Fondo blanco sólido */
+        padding: 20px;
+        border-radius: 0 0 20px 20px; /* Bordes redondeados abajo */
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        margin-bottom: 20px;
+    }
+  body {
+    background-color: #f8faff;
+    margin: 0;
+    padding: 0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; /* Fuente por defecto */
+  }
+
+  .seccion-partidos {
+    padding: 50px 20px;
+    max-width: 1200px; /* Ancho máximo para que no se pegue a los bordes en pantallas grandes */
+    margin: 0 auto;
+  }
+
+  .titulo-principal {
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 900;
+    font-size: 3.5rem;
+    color: #ffffff;
+    text-transform: uppercase;
+    letter-spacing: -2px;
+    margin-bottom: 5px;
+    text-align: center;
+  }
+
+  .titulo-principal .destacado {
+    color: #00d4ff;
+  }
+
+  .subtitulo {
+  background: transparent;
+    padding: 0;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 1.2rem;
+    color: rgba(255, 255, 255, 0.9);
+    text-align: center;
+    margin-bottom: 50px;
+    font-weight: 400;
+  }
+
+
+  .match-grid {
+    display: flex !important;
+    flex-direction: row !important;
+    flex-wrap: wrap;
+    padding: 20px;
+    justify-content: center;
+    align-items: flex-start;
+    gap: 20px;
+    padding: 20px;
+    width: 100%;
+  }
+
+  .match-card {
+    background: #ffffff;
+    width: 300px;
+    border-radius: 16px;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+  }
+
+  .match-card:hover {
+    transform: translateY(-5px);
+  }
+
+  .match-image {
+    height: 180px;
+    background-size: cover;
+    background-position: center;
+    position: relative;
+  }
+
+  .status-badge {
+    position: absolute;
+    top: 15px;
+    left: 15px;
+    background: #28a745; /* Verde disponible */
+    color: white;
+    padding: 5px 15px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: bold;
+    font-family: 'Montserrat', sans-serif;
+  }
+
+  .match-body {
+    padding: 20px;
+  }
+
+  .match-info h3 {
+    font-family: 'Montserrat', sans-serif;
+    margin: 0 0 10px 0;
+    font-size: 1.2rem;
+  }
+
+  .match-info p, .match-info span {
+    display: flex;
+    align-items: center;
+    gap: 8px; /* Espacio con el icono */
+    font-size: 0.95rem;
+    color: #555;
+    margin-bottom: 6px;
+  }
+
+  .match-action {
+    margin-top: 15px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 10px 5px 10px;
+  }
+
+  .price {
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 800;
+    color: #007ce2;
+    font-size: 1.1rem;
+    margin: 0;
+  }
+
+  .btn-book {
+    background: #007ce2;
+    color: white;
+    border: none;
+    padding: 8px 24px;
+    border-radius: 12px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background 0.3s;
+    font-family: 'Montserrat', sans-serif;
+  }
+
+  .btn-book:hover {
+    background: #005fa3;
+  }
+
+  .no-matches {
+    text-align: center;
+    color: #888;
+    font-size: 1.2rem;
+    width: 100%;
+  }
+
+  @media (max-width: 768px) {
+    .titulo-principal {
+      font-size: 2.5rem;
+    }
+    .match-card {
+      width: 100%; /* Una sola tarjeta por fila en móvil */
+    }
+  }
+    <style>
+  .count-badge {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 0.9rem;
+    color: #333;
+    background: #f0f2f5; /* Un fondo gris clarito tipo pastilla */
+    padding: 4px 10px;
+    border-radius: 8px;
+  }
+
+  .count-badge strong {
+    color: #007ce2; /* El azul de Skyscanner para el número */
+    font-size: 1rem;
+  }
+
+  .full {
+    color: #666;
+    font-weight: bold;
+    text-transform: uppercase;
+    font-size: 0.75rem;
+  }
+
+  .progress-fill {
+    transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  .filter-section {
+    width: 100%;
+    max-width: 1140px;
+    margin: 20px auto;
+    padding: 0;
+    display: flex;
+    justify-content: flex-start;
+  }
+
+  .filter-form label {
+    color: #ffffff;
+    font-weight: 600;
+}
+
+  .filter-form {
+    margin-left: 0;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    padding: 10px 20px;
+    border-radius: 30px;
+  }
+
+  .filter-form select {
+    background: #ffffff;
+    color: #333;
+    border: none;
+    font-weight: bold;
+  }
+
+  .btn-clear {
+   .btn-clear {
+    color: #00d4ff !important;
+    font-weight: bold;
+  }
+</style> </div> ```
