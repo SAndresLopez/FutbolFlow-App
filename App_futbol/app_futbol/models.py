@@ -1,5 +1,5 @@
 from django.db import models
-
+from django.contrib.auth.models import User
 
 class Partido(models.Model):
     nombre_encuentro = models.CharField(max_length=100)
@@ -29,26 +29,32 @@ class Partido(models.Model):
 from django.contrib.auth.models import User
 
 class PerfilJugador(models.Model):
-    usuario = models.OneToOneField(User, on_delete=models.CASCADE)
-    posicion = models.CharField(max_length=50, choices=[
+    POSICIONES = [
         ('Portero', 'Portero'),
         ('Defensa', 'Defensa'),
         ('Mediocampista', 'Mediocampista'),
         ('Delantero', 'Delantero'),
-    ], default='Mediocampista')
+    ]
+
+    usuario = models.OneToOneField(User, on_delete=models.CASCADE, related_name='perfil')
+
+    apodo = models.CharField(max_length=30, blank=True, verbose_name="Apodo de Crack")
+    telefono = models.CharField(max_length=15, blank=True)
+    distrito = models.CharField(max_length=50, blank=True)
+    posicion = models.CharField(max_length=50, choices=POSICIONES, default='Mediocampista')
+    ranking = models.DecimalField(max_digits=3, decimal_places=2, default=5.0)
 
     class Meta:
         verbose_name = "Perfil de Jugador"
         verbose_name_plural = "Perfiles de Jugadores"
 
-    ranking = models.DecimalField(max_digits=3, decimal_places=2, default=5.0)
-
     def __str__(self):
-        return f"{self.usuario.username} - {self.posicion}"
+        return f"{self.usuario.username} - {self.apodo if self.apodo else self.posicion}"
+
 
 class Inscripcion(models.Model):
     partido = models.ForeignKey(Partido, on_delete=models.CASCADE, related_name='inscripciones')
-    nombre_jugador = models.CharField(max_length=100)
+    usuario = models.CharField(max_length=100)
     fecha_inscripcion = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):

@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Registro FutbolAPP</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="bg-light d-flex align-items-center justify-content-center vh-100">
+
+    <div class="p-4 bg-white rounded shadow" style="max-width: 400px; width: 100%;">
+        <h2 class="text-center mb-4">¡Casi listo! ⚽</h2>
+
+        <form method="post" action="/completar-perfil/">
+            {% csrf_token %}
+
+            <div class="mb-3">
+                <input type="text" name="apodo" class="form-control" placeholder="TU APODO" required>
+            </div>
+
+            <div class="mb-3">
+                <input type="tel" name="telefono" class="form-control" placeholder="TU TELÉFONO" required>
+            </div>
+
+            <div class="mb-3">
+                <select name="posicion" class="form-select" required>
+                    <option value="" disabled selected>Tu Posición</option>
+                    <option value="Arquero">Arquero</option>
+                    <option value="Defensa">Defensa</option>
+                    <option value="Mediocampista">Mediocampista</option>
+                    <option value="Delantero">Delantero</option>
+                </select>
+            </div>
+
+            <div class="mb-3">
+                <select name="distrito" class="form-select" required>
+                    <option value="" disabled selected>Tu Distrito</option>
+                    <option value="San Borja">San Borja</option>
+                    <option value="Surco">Surco</option>
+                    <option value="Miraflores">Miraflores</option>
+                    <option value="La Molina">La Molina</option>
+                </select>
+            </div>
+
+            <button type="submit" class="btn btn-success w-100">¡Finalizar Fichaje!</button>
+        </form>
+    </div>
+
+</body>
+</html>
