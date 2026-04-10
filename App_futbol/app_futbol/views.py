@@ -36,14 +36,12 @@ def completar_perfil(request):
     print("🚀 ¡ENTRÉ A LA VISTA!")
     user = request.user
 
-    # 1. IDENTIFICACIÓN Y CREACIÓN (Lo que faltaba)
     if not user.is_authenticated:
         data = request.session.get('socialaccount_sociallogin')
         if isinstance(data, dict):
             email = data.get('user', {}).get('email')
             print(f"📧 Identificado por sesión: {email}")
 
-            # Buscamos al usuario o lo CREAMOS si es nuevo
             user, created = User.objects.get_or_create(
                 email=email,
                 defaults={'username': email.split('@')}
@@ -51,20 +49,16 @@ def completar_perfil(request):
             if created:
                 print(f"👤 NUEVO USUARIO CREADO: {user.username}")
 
-    # 2. VERIFICACIÓN DE SEGURIDAD
     if not user or user.is_anonymous:
         print("❌ ERROR: Sigo sin usuario. Revisa la sesión.")
         return redirect('/accounts/google/login/')
 
-    # 3. PROCESAR EL POST (Guardar los datos de FutbolAPP)
     if request.method == 'POST':
         print(f"📩 ¡RECIBÍ UN POST PARA: {user.email}!")
 
-        # Nos aseguramos de que el usuario tenga ID
         if not user.pk:
             user.save()
 
-        # Guardamos el perfil con los datos del formulario
         perfil, created = PerfilJugador.objects.get_or_create(usuario=user)
         perfil.apodo = request.POST.get('apodo')
         perfil.telefono = request.POST.get('telefono')
@@ -74,7 +68,6 @@ def completar_perfil(request):
 
         print("✅ PERFIL GUARDADO EXITOSAMENTE")
 
-        # 4. LOGIN OFICIAL (Para que no te pida loguear de nuevo)
         login(request, user, backend='django.contrib.auth.backends.ModelBackend')
         return redirect('home')
 
