@@ -35,14 +35,13 @@ class PerfilJugador(models.Model):
         ('Mediocampista', 'Mediocampista'),
         ('Delantero', 'Delantero'),
     ]
-
     usuario = models.OneToOneField(User, on_delete=models.CASCADE, related_name='perfil')
-
     apodo = models.CharField(max_length=30, blank=True, verbose_name="Apodo de Crack")
     telefono = models.CharField(max_length=15, blank=True)
     distrito = models.CharField(max_length=50, blank=True)
     posicion = models.CharField(max_length=50, choices=POSICIONES, default='Mediocampista')
     ranking = models.DecimalField(max_digits=3, decimal_places=2, default=5.0)
+    partidos_jugados = models.IntegerField(default=0)
 
     class Meta:
         verbose_name = "Perfil de Jugador"

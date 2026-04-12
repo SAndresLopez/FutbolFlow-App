@@ -1,83 +1,63 @@
 {% load static %}
-{% load socialaccount %}  ```
+{% load socialaccount %}
 
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700;800;900&display=swap" rel="stylesheet">
 
-<div class="seccion-partidos">
-
+<div class="seccion-partidos container-fluid">
     <h1 class="titulo-principal">PARTIDOS <span class="destacado">DISPONIBLES</span></h1>
-    <p class="subtitulo">Únete a la pichanga y demuestra tu nivel</p>
-<div class="filter-section">
-    <form method="GET" action="{% url 'home' %}" class="filter-form">
-        <label for="distrito">Filtrar por zona:</label>
-        <select name="distrito" id="distrito" onchange="this.form.submit()">
-            <option value="">Todos los distritos</option>
-            <option value="MIRAFLORES" {% if request.GET.distrito == "MIRAFLORES" %}selected{% endif %}>Miraflores</option>
-            <option value="SURQUILLO" {% if request.GET.distrito == "SURQUILLO" %}selected{% endif %}>Surquillo</option>
-        </select>
-        <a href="{% url 'home' %}" class="btn-clear">Limpiar</a>
-    </form>
-</div>
-<div class="match-grid">
-  {% for partido in partidos %}
-    <div class="match-card">
-        <div class="match-image" style="background-image: url('https://images.unsplash.com/photo-1574629810360-7efbbe195018?q=80&w=500');">
-            <div class="status-badge">Disponible</div>
-        </div>
+    <p class="subtitulo text-center">Únete a la pichanga y demuestra tu nivel</p>
 
-        <div class="match-body">
-            <div class="match-info">
-                <h3>{{ partido.nombre_encuentro }}</h3>
-                <p class="location"><i class="fas fa-map-marker-alt"></i> {{ partido.lugar }}</p>
-                <p><i class="far fa-calendar-alt"></i> {{ partido.fecha|date:"d M, Y" }}</p>
+    <div class="filter-section">
+        <form method="GET" action="{% url 'home' %}" class="filter-form">
+            <label for="distrito">Filtrar por zona:</label>
+            <select name="distrito" id="distrito" onchange="this.form.submit()">
+                <option value="">Todos los distritos</option>
+                <option value="MIRAFLORES" {% if request.GET.distrito == "MIRAFLORES" %}selected{% endif %}>Miraflores</option>
+                <option value="SURQUILLO" {% if request.GET.distrito == "SURQUILLO" %}selected{% endif %}>Surquillo</option>
+            </select>
+            <a href="{% url 'home' %}" class="btn-clear">Limpiar</a>
+        </form>
+    </div>
 
-                <div class="slots-container">
-                    <div class="slots-text">
-                        <span class="count-badge">
-                            <i class="fas fa-users"></i>
-                            <strong>{{ partido.cupos_inscritos }}</strong>/{{ partido.cupos_max }} Jugadores
-                        </span>
-                    </div>
+    <div class="match-grid">
+        <div class="row">
+            <div class="col-md-8">
+                <div class="row row-cols-1 row-cols-md-1 row-cols-lg-2 g-4">
+                    {% for partido in partidos %}
+                        {% include 'includes/partido_card.html' %}
+                    {% empty %}
+                        <p class="no-matches">No hay partidos creados todavía.</p>
+                    {% endfor %}
+                </div>
+            </div>
 
-                    <div class="progress-bar">
-                        <div class="progress-fill" style="width: {{ partido.porcentaje_llenado }}%;"></div>
-                    </div>
-
-                    {% if partido.cupos_disponibles <= 3 and partido.cupos_disponibles > 0 %}
-                        <span class="urgent">¡Casi lleno!</span>
-                    {% elif partido.cupos_disponibles == 0 %}
-                        <span class="full">¡Completo!</span>
+            <div class="col-md-4">
+                <div class="profile-card-sidebar shadow-lg p-4 rounded" style="background-color: #1a1a1a; color: white; border: 1px solid #333; position: sticky; top: 20px;">
+                    {% if user.is_authenticated %}
+                        <div class="text-center mb-3">
+                            <img src="https://ui-avatars.com/api/?name={{ user.username }}&background=00d4ff&color=fff" class="rounded-circle mb-2" width="80">
+                            <h5 class="fw-bold">{{ user.username }}</h5>
+                            <p class="text-info small">RANKING: ⭐⭐⭐⭐⭐</p>
+                        </div>
+                        <div class="mt-3">
+                            <p class="mb-1 small">⚽ Posición: Delantero</p>
+                            <p class="mb-1 small">📊 Partidos: 12</p>
+                            <hr style="border-color: #444;">
+                            <a href="/accounts/logout/" class="btn btn-outline-danger btn-sm w-100 mt-2">Cerrar Sesión</a>
+                        </div>
+                    {% else %}
+                        <h5 class="text-center">¿Eres un Crack?</h5>
+                        <p class="small text-muted text-center">Loguéate para ver tu nivel.</p>
+                        <a href="{% provider_login_url 'google' %}" class="btn btn-primary w-100 fw-bold">Login con Google</a>
                     {% endif %}
                 </div>
-                    <div class="progress-bar">
-                        <div class="progress-fill" style="width: {{ partido.porcentaje_llenado }}%;"></div>
-                    </div>
             </div>
-            <div class="card-footer">
-                <div class="price-section">
-                    <span class="currency">S/</span>
-                    <span class="amount">{{ partido.precio }}</span>
-                </div>
-                {% if user.is_authenticated %}
-                    <a href="{% url 'unirse_partido' partido.id %}" class="btn-book-link">
-                        <button class="btn-book">
-                            {% if partido.cupos_restantes == 0 %}Lleno{% else %}Unirme{% endif %}
-                        </button>
-                    </a>
-                {% else %}
-                    <a href="{% provider_login_url 'google' %}" class="btn-book-link">
-                        <button class="btn-book" style="background: #db4437;">
-                            <i class="fab fa-google"></i> Logueate para unirte
-                        </button>
-                    </a>
-                {% endif %}
-            </div>
-        </div> </div> {% empty %}
-        <p class="no-matches">No hay partidos creados todavía.</p>
-    {% endfor %}
+        </div>
+    </div>
 </div>
+
     <style>
     body {
         background-color: #1a1a1a;
@@ -151,8 +131,9 @@
 
       .match-card {
         background: #ffffff;
+        padding: 0 !important;
         width: 300px;
-        border-radius: 16px;
+        border-radius: 20px;
         display: flex;
         flex-direction: column;
         overflow: hidden;
@@ -164,17 +145,23 @@
       }
 
       .match-image {
-        height: 180px;
+        width: 100%;
+        height: 200px !important;
+        margin: 0;
+        border-radius: 0;
         background-size: cover;
         background-position: center;
         position: relative;
+      }
+      .profile-card-sidebar {
+        margin-left: 15px;
       }
 
       .status-badge {
         position: absolute;
         top: 15px;
         left: 15px;
-        background: #28a745; /* Verde disponible */
+        background: #28a745;
         color: white;
         padding: 5px 15px;
         border-radius: 20px;
@@ -345,4 +332,42 @@
         flex-direction: column;
         text-align: left;
     }
+        .profile-sidebar {
+    background: #1a1a1a;
+    border-radius: 20px;
+    padding: 25px;
+    border: 1px solid #333;
+    position: sticky;
+    top: 20px;
+}
+
+.profile-avatar {
+    width: 100px;
+    height: 100px;
+    border: 4px solid #00d4ff; /* El celeste que te gusta */
+    border-radius: 50%;
+    margin-bottom: 15px;
+}
+
+.stat-card {
+    background: #262626;
+    border-radius: 12px;
+    padding: 10px;
+    text-align: center;
+    border: 1px solid #444;
+}
+
+.ranking-stars {
+    color: #ffc107; /* Dorado para las estrellas */
+    font-size: 1.2rem;
+}
+
+.history-item {
+    background: #2a2a2a;
+    border-left: 4px solid #00d4ff;
+    padding: 10px;
+    margin-bottom: 8px;
+    border-radius: 5px;
+    font-size: 0.9rem;
+}
     </style> </div>

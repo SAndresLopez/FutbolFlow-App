@@ -9,7 +9,20 @@ from .models import Partido, Inscripcion, PerfilJugador
 
 def home(request):
     partidos = Partido.objects.all()
-    return render(request, 'home.html', {'partidos': partidos})
+    perfil = None
+    if request.user.is_authenticated:
+        try:
+            perfil = PerfilJugador.objects.get(usuario=request.user)
+            print(f"✅ Perfil encontrado: {perfil.apodo}")
+        except PerfilJugador.DoesNotExist:
+            print("⚠️ El usuario no tiene perfil creado aún")
+            pass
+
+    context = {
+        'partidos': partidos,
+        'perfil_jugador': perfil
+    }
+    return render(request, 'home.html',context)
 
 @login_required
 def unirse_partido(request, partido_id):
