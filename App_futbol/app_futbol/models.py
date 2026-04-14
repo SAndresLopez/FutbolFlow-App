@@ -25,9 +25,6 @@ class Partido(models.Model):
             return min(porcentaje, 100)
         return 0
 
-
-from django.contrib.auth.models import User
-
 class PerfilJugador(models.Model):
     POSICIONES = [
         ('Portero', 'Portero'),
@@ -42,6 +39,7 @@ class PerfilJugador(models.Model):
     posicion = models.CharField(max_length=50, choices=POSICIONES, default='Mediocampista')
     ranking = models.DecimalField(max_digits=3, decimal_places=2, default=5.0)
     partidos_jugados = models.IntegerField(default=0)
+    foto = models.ImageField(upload_to='perfiles/', null=True, blank=True, verbose_name="Foto de Crack")
 
     class Meta:
         verbose_name = "Perfil de Jugador"

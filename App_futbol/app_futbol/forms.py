@@ -29,3 +29,11 @@ class RegistroPerfilForm(forms.ModelForm):
         if len(telefono) < 9:
             raise forms.ValidationError("El teléfono debe tener al menos 9 dígitos.")
         return telefono
+
+class PerfilJugadorForm(forms.ModelForm):
+    class Meta:
+        model = PerfilJugador
+        fields = ['apodo', 'posicion', 'distrito', 'telefono', 'foto']
+        widgets = {
+            'foto': forms.FileInput(attrs={'class': 'form-control'}),
+        }

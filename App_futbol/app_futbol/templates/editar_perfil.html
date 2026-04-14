@@ -1,0 +1,60 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card bg-dark text-white border-secondary shadow-lg">
+                <div class="card-header border-secondary bg-black text-center py-3">
+                    <h3 class="text-info fw-bold mb-0">🛠️ CONFIGURA TU PERFIL</h3>
+                </div>
+                <div class="card-body p-4">
+                    <form method="POST" enctype="multipart/form-data">
+                        {% csrf_token %}
+
+                        {% for field in form %}
+                        <div class="mb-3">
+                            <label class="form-label text-info small fw-bold">{{ field.label }}</label>
+                            {{ field.errors }}
+                            <div class="input-group">
+                                <span class="input-group-text bg-black border-secondary text-info">
+                                    {% if field.name == 'apodo' %}<i class="fas fa-user-tag"></i>
+                                    {% elif field.name == 'posicion' %}<i class="fas fa-running"></i>
+                                    {% elif field.name == 'distrito' %}<i class="fas fa-map-marker-alt"></i>
+                                    {% elif field.name == 'telefono' %}<i class="fas fa-phone"></i>
+                                    {% else %}<i class="fas fa-image"></i>{% endif %}
+                                </span>
+                                {{ field }}
+                            </div>
+                        </div>
+                        {% endfor %}
+
+                        <div class="d-grid gap-2 mt-4">
+                            <button type="submit" class="btn btn-info btn-lg fw-bold shadow">
+                                <i class="fas fa-save me-2"></i>GUARDAR CAMBIOS
+                            </button>
+                            <a href="{% url 'home' %}" class="btn btn-outline-secondary">Cancelar</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    /* Esto hace que los inputs de Django se vean oscuros y pro */
+    input, select, textarea {
+        background-color: #1a1d20 !important;
+        border: 1px solid #373b3e !important;
+        color: white !important;
+        padding: 10px !important;
+        width: 100%;
+        border-radius: 0 5px 5px 0 !important;
+    }
+    input:focus, select:focus {
+        border-color: #0dcaf0 !important;
+        box-shadow: 0 0 0 0.25rem rgba(13, 202, 240, 0.25) !important;
+    }
+</style>
+{% endblock %}

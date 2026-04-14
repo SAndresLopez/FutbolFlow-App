@@ -5,6 +5,7 @@ from django.contrib.auth.models import User
 from django.contrib.auth import login
 from django.views.decorators.csrf import csrf_exempt
 from .models import Partido, Inscripcion, PerfilJugador
+from .forms import PerfilJugadorForm
 
 
 def home(request):
@@ -20,9 +21,9 @@ def home(request):
 
     context = {
         'partidos': partidos,
-        'perfil_jugador': perfil
+        'perfil': perfil
     }
-    return render(request, 'home.html',context)
+    return render(request, 'home.html', context)
 
 @login_required
 def unirse_partido(request, partido_id):
@@ -85,3 +86,17 @@ def completar_perfil(request):
         return redirect('home')
 
     return render(request, 'socialaccount/signup.html', {'user': user})
+
+@login_required
+def editar_perfil(request):
+    perfil = request.user.perfil
+
+    if request.method == 'POST':
+        form = PerfilJugadorForm(request.POST, request.FILES, instance=perfil)
+        if form.is_valid():
+            form.save()
+            return redirect('home')
+    else:
+        form = PerfilJugadorForm(instance=perfil)
+
+    return render(request, 'editar_perfil.html', {'form': form})
