@@ -1,4 +1,4 @@
-from Usuarios import Jugador
+from app_futbol.Usuarios import Jugador
 from gestor_partidos import GestorPartidos
 
 def pantalla_inicio():

@@ -4,9 +4,8 @@ from django.contrib import messages
 from django.contrib.auth.models import User
 from django.contrib.auth import login
 from django.views.decorators.csrf import csrf_exempt
-from .models import Partido, Inscripcion, PerfilJugador
+from .models import Partido, Inscripcion, PerfilJugador,Reporte
 from .forms import PerfilJugadorForm
-
 
 def home(request):
     partidos = Partido.objects.all()
@@ -143,3 +142,20 @@ def eliminar_inscripcion(request, partido_id):
     partido = get_object_or_404(Partido, id=partido_id)
     Inscripcion.objects.filter(partido=partido, usuario=request.user).delete()
     return redirect('elegir_formacion', partido_id=partido.id)
+
+
+def enviar_reporte(request, partido_id=None):
+    if request.method == 'POST':
+        nuevo_reporte = Reporte(
+            usuario_creador=request.user,
+            tipo=request.POST.get('tipo'),
+            descripcion=request.POST.get('descripcion'),
+            partido_id=partido_id if partido_id else None,
+            captura=request.FILES.get('captura')
+        )
+
+        nuevo_reporte.save()
+        messages.success(request, '¡Gracias! Tu reporte ha sido enviado y será revisado.')
+        return redirect('home')
+
+    return render(request, 'enviar_reporte.html', {'partido_id': partido_id})

@@ -1,0 +1,87 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="container mt-5 d-flex justify-content-center">
+    <div class="col-md-6 report-container">
+        <h2 class="text-info mb-4">
+            <i class="fas fa-exclamation-triangle"></i> Enviar Reporte
+        </h2>
+
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+
+            <div class="mb-3">
+                <label class="form-label text-white">Tipo de problema</label>
+                <select name="tipo" class="form-select" required>
+                    <option value="Conducta Antideportiva">Conducta Antideportiva</option>
+                    <option value="Lenguaje Ofensivo">Lenguaje Ofensivo</option>
+                    <option value="Trampa/Hacking">Trampa / Hacking</option>
+                    <option value="Otro">Otro</option>
+                </select>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label text-white">Descripción detallada</label>
+                <textarea name="descripcion" class="form-control" rows="4" placeholder="Cuéntanos qué pasó..." required></textarea>
+            </div>
+
+            <div class="mb-4">
+                <label class="form-label text-white">Evidencia (Opcional)</label>
+                <input type="file" name="evidencia" class="form-control" accept="image/*">
+
+                <img id="preview" src="#" alt="Vista previa" style="display:none; width:100%; margin-top:15px; border-radius:10px; border: 1px solid #00d4ff;">
+            </div>
+
+            <div class="d-grid gap-2">
+                <button type="submit" class="btn btn-enviar">
+                    Enviar Reporte
+                </button>
+                <a href="{% url 'home' %}" class="btn btn-outline-secondary">Cancelar</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<style>
+    /* Aquí va el código CSS que ya tienes en tu archivo */
+    .report-container {
+        background: rgba(255, 255, 255, 0.05);
+        backdrop-filter: blur(15px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 20px;
+        padding: 30px;
+        box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+    }
+
+    .btn-enviar {
+        background: linear-gradient(45deg, #00d4ff, #0056b3);
+        border: none;
+        color: white;
+        font-weight: bold;
+        padding: 12px;
+        text-transform: uppercase;
+        transition: 0.4s;
+    }
+
+    .btn-enviar:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 6px 20px rgba(0, 212, 255, 0.6);
+        filter: brightness(1.2);
+    }
+    /* ... resto de tus estilos ... */
+</style>
+
+<script>
+    // Tu script para mostrar la imagen apenas se selecciona
+    document.querySelector('input[type="file"]').onchange = function(e) {
+        let reader = new FileReader();
+        reader.onload = function() {
+            let preview = document.getElementById('preview');
+            preview.src = reader.result;
+            preview.style.display = 'block';
+        };
+        reader.readAsDataURL(e.target.files);
+    };
+</script>
+{% endblock %}

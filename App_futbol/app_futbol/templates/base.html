@@ -41,6 +41,18 @@
     </nav>
 
     <main>
+        <div class="container mt-3">
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert"
+                         style="background: rgba(0, 212, 255, 0.2); color: white; border: 1px solid #00d4ff;">
+                        <i class="fas fa-info-circle me-2"></i> {{ message }}
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        </div>
+
         {% block content %}
         {% endblock %}
     </main>

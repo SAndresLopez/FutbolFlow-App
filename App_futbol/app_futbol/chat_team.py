@@ -1,5 +1,3 @@
-from Usuarios import Jugador
-
 class Mensaje:
     def __init__(self, autor, contenido):
         self.autor_nombre = autor.nombre

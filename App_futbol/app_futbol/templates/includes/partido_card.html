@@ -1,53 +1,88 @@
-    {% load socialaccount %}
-    <div class="match-card">
-        <div class="match-image" style="background-image: url('https://images.unsplash.com/photo-1574629810360-7efbbe195018?q=80&w=500');position: relative;">
-            <div class="status-badge">Disponible</div>
-        </div>
+ {% load socialaccount %}
+<div class="match-card">
+    <div class="match-image" style="background-image: url('https://images.unsplash.com/photo-1574629810360-7efbbe195018?q=80&w=500');position: relative;">
 
-        <div class="match-body" style="padding: 20px;">
-            <div class="match-info">
-                <h3>{{ partido.nombre_encuentro }}</h3>
-                <p class="location"><i class="fas fa-map-marker-alt"></i> {{ partido.lugar }}</p>
-                <p><i class="far fa-calendar-alt"></i> {{ partido.fecha|date:"d M, Y" }}</p>
-
-                <div class="slots-container">
-                    <div class="slots-text">
-                        <span class="count-badge">
-                            <i class="fas fa-users"></i>
-                            <strong>{{ partido.cupos_inscritos }}</strong>/{{ partido.cupos_max }} Jugadores
-                        </span>
-                    </div>
-
-                    <div class="progress-bar">
-                        <div class="progress-fill" style="width: {{ partido.porcentaje_llenado }}%;"></div>
-                    </div>
-
-                    {% if partido.cupos_disponibles <= 3 and partido.cupos_disponibles > 0 %}
-                        <span class="urgent">¡Casi lleno!</span>
-                    {% elif partido.cupos_disponibles == 0 %}
-                        <span class="full">¡Completo!</span>
-                    {% endif %}
-                </div>
-                    <div class="progress-bar">
-                        <div class="progress-fill" style="width: {{ partido.porcentaje_llenado }}%;"></div>
-                    </div>
-            </div>
-            <div class="card-footer">
-                <div class="price-section">
-                    <span class="currency">S/</span>
-                    <span class="amount">{{ partido.precio }}</span>
-                </div>
-                {% if user.is_authenticated %}
-                    <a href="{% url 'elegir_formacion' partido.id %}" class="btn-book">
-                        Unirme
-                    </a>
-                {% else %}
-                    <a href="{% provider_login_url 'google' %}" class="btn-book-link">
-                        <button class="btn-book" style="background: #db4437;">
-                            <i class="fab fa-google"></i> Logueate para unirte
-                        </button>
-                    </a>
-                {% endif %}
-            </div>
+        <div class="status-badge
+            {% if partido.estado_dinamico == 'Cupos Llenos' %}bg-warning text-dark
+            {% elif partido.estado_dinamico == 'Finalizado o En curso' %}bg-danger
+            {% else %}bg-success{% endif %}"
+            style="
+            position: absolute;
+            top: 12px;
+            left: 12px;
+            display: inline-block;
+            width: auto;
+            padding: 4px 12px;
+            border-radius: 50px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        ">
+            {{ partido.estado_dinamico }}
         </div>
     </div>
+
+    <div class="match-body" style="padding: 20px;">
+        <div class="match-info">
+            <h3>{{ partido.nombre_encuentro }}</h3>
+            <p class="location"><i class="fas fa-map-marker-alt"></i> {{ partido.lugar }}</p>
+            <p><i class="far fa-calendar-alt"></i> {{ partido.fecha|date:"d M, Y - H:i" }}</p>
+
+            <div class="slots-container">
+                <div class="slots-text">
+                    <span class="count-badge">
+                        <i class="fas fa-users"></i>
+                        {# Usamos el related_name 'Inscripcion' que definiste en models.py #}
+                        <strong>{{ partido.Inscripcion.count }}</strong>/{{ partido.cupos_max }} Jugadores
+                    </span>
+                </div>
+
+                <div class="progress-bar" style="background: #333; height: 8px; border-radius: 4px; margin: 10px 0;">
+                    {# Calculamos el porcentaje al vuelo #}
+                    <div class="progress-fill" style="width: {% widthratio partido.Inscripcion.count partido.cupos_max 100 %}%; background: #0dcaf0; height: 100%; border-radius: 4px;"></div>
+                </div>
+
+                {% with inscritos=partido.Inscripcion.count %}
+                    {% with disponibles=partido.cupos_max|add:"-inscritos" %}
+                        {% if disponibles <= 3 and disponibles > 0 %}
+                            <span class="urgent" style="color: #ffc107; font-size: 0.8rem; font-weight: bold;">¡Casi lleno!</span>
+                        {% elif disponibles == 0 %}
+                            <span class="full" style="color: #dc3545; font-size: 0.8rem; font-weight: bold;">¡Cupos Completos!</span>
+                        {% endif %}
+                    {% endwith %}
+                {% endwith %}
+            </div>
+        </div>
+
+        <div class="card-footer" style="display: flex; justify-content: space-between; align-items: center; margin-top: 15px;">
+            <div class="price-section">
+                <span class="currency">S/</span>
+                <span class="amount" style="font-size: 1.2rem; font-weight: bold;">{{ partido.precio }}</span>
+            </div>
+
+            {% if user.is_authenticated %}
+                {% if partido.estado_dinamico == "Finalizado o En curso" %}
+                    <button class="btn-book" style="background: #555; cursor: not-allowed;" disabled>Cerrado</button>
+                {% else %}
+                <div class="d-flex gap-2 mt-3">
+                    <a href="{% url 'elegir_formacion' partido.id %}" class="btn-book" style="text-decoration: none; background: #0dcaf0; color: black; padding: 8px 16px; border-radius: 5px; font-weight: bold;">
+                        Unirme
+                    </a>
+                    </a>
+                    <a href="{% url 'enviar_reporte' %}?partido={{ partido.id }}" class="btn btn-outline-danger" title="Reportar problema">
+                        <i class="fas fa-flag"></i>
+                    </a>
+                </div>
+                {% endif %}
+            {% else %}
+                <a href="{% provider_login_url 'google' %}" class="btn-book-link">
+                    <button class="btn-book" style="background: #db4437; color: white; border: none; padding: 8px 16px; border-radius: 5px;">
+                        <i class="fab fa-google"></i> Login
+                    </button>
+                </a>
+            {% endif %}
+        </div>
+    </div>
+</div>

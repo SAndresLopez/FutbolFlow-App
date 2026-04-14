@@ -12,7 +12,8 @@ urlpatterns = [
     path('partido/<int:partido_id>/inscribirse/<str:equipo>/<int:pos_num>/',
          views.inscribirse,
          name='inscribirse'),
-    path('partido/<int:partido_id>/eliminar_inscripcion/', views.eliminar_inscripcion, name='eliminar_inscripcion')
+    path('partido/<int:partido_id>/eliminar_inscripcion/', views.eliminar_inscripcion, name='eliminar_inscripcion'),
+    path('reportar/', views.enviar_reporte, name='enviar_reporte')
 ]
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

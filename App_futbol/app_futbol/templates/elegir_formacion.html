@@ -99,9 +99,13 @@
             </div>
         </div>
 
-        <div class="card-footer text-center border-secondary py-3">
+        <div class="card-footer d-flex justify-content-between border-secondary py-3">
             <a href="{% url 'home' %}" class="btn btn-outline-info">
-                <i class="fas fa-arrow-left me-2"></i>Volver al Inicio
+                <i class="fas fa-arrow-left me-2"></i>Volver
+            </a>
+
+            <a href="{% url 'enviar_reporte' %}?partido={{ partido.id }}" class="btn btn-link text-danger text-decoration-none small">
+                <i class="fas fa-info-circle me-1"></i>Reportar incidencia
             </a>
         </div>
     </div>
