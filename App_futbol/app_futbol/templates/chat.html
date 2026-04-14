@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="report-container p-4 mb-4 text-center" style="border-left: 5px solid {% if mi_equipo == 'A' %}#00d4ff{% else %}#ff00ff{% endif %}; background: rgba(0,0,0,0.4);">
+        <h2 class="text-white mb-0">
+            <i class="fas fa-comments text-info"></i> ESTRATEGIA:
+            <span style="color: {% if mi_equipo == 'A' %}#00d4ff{% else %}#ff00ff{% endif %};">EQUIPO {{ mi_equipo }}</span>
+        </h2>
+        <small class="text-muted">Solo los miembros de tu equipo pueden leer esto.</small>
+    </div>
+
+    <div class="chat-box p-4 mb-4" style="height: 500px; overflow-y: auto; background: rgba(15, 15, 25, 0.9); border-radius: 15px; border: 1px solid rgba(0, 212, 255, 0.2);">
+        {% for m in mensajes %}
+            <div class="d-flex {% if m.usuario == request.user %}justify-content-end{% else %}justify-content-start{% endif %} mb-3">
+                <div class="p-3 shadow-sm" style="max-width: 70%; border-radius: 15px;
+                    {% if m.usuario == request.user %}
+                        background: linear-gradient(45deg, #0056b3, #00d4ff); color: white;
+                    {% else %}
+                        background: rgba(255, 255, 255, 0.1); color: #e0e0e0; border: 1px solid rgba(255,255,255,0.1);
+                    {% endif %}">
+                    <small class="d-block fw-bold" style="font-size: 0.7rem; opacity: 0.8;">{{ m.usuario.username }}</small>
+                    {{ m.contenido }}
+                    <small class="d-block text-end mt-1" style="font-size: 0.6rem; opacity: 0.6;">{{ m.fecha_envio|date:"H:i" }}</small>
+                </div>
+            </div>
+        {% empty %}
+            <p class="text-center text-muted mt-5">No hay mensajes aún. ¡Arma la táctica!</p>
+        {% endfor %}
+    </div>
+
+    <form method="POST" class="d-flex gap-2">
+        {% csrf_token %}
+        <input type="text" name="mensaje" class="form-control bg-dark text-white border-info" placeholder="Escribe un mensaje al equipo..." required autocomplete="off">
+        <button type="submit" class="btn btn-info shadow-sm">
+            <i class="fas fa-paper-plane"></i>
+        </button>
+    </form>
+</div>
+
+<style>
+    /* Estilo para que la barra de scroll sea neón también */
+    .chat-box::-webkit-scrollbar { width: 6px; }
+    .chat-box::-webkit-scrollbar-thumb { background: #00d4ff; border-radius: 10px; }
+    .chat-box::-webkit-scrollbar-track { background: rgba(0,0,0,0.2); }
+</style>
+{% endblock %}

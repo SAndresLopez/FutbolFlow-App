@@ -122,3 +122,21 @@ class Ranking(models.Model):
 
     class Meta:
         ordering = ['-puntos']
+
+class MensajeChat(models.Model):
+    EQUIPOS = [
+        ('A', 'Equipo A'),
+        ('B', 'Equipo B'),
+    ]
+
+    partido = models.ForeignKey(Partido, on_delete=models.CASCADE, related_name='mensajes')
+    usuario = models.ForeignKey(User, on_delete=models.CASCADE)
+    contenido = models.TextField()
+    equipo = models.CharField(max_length=1, choices=EQUIPOS)
+    fecha_envio = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['fecha_envio']
+
+    def __str__(self):
+        return f"{self.usuario.username} - Equipo {self.equipo}"

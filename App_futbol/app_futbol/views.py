@@ -4,7 +4,7 @@ from django.contrib import messages
 from django.contrib.auth.models import User
 from django.contrib.auth import login
 from django.views.decorators.csrf import csrf_exempt
-from .models import Partido, Inscripcion, PerfilJugador,Reporte
+from .models import Partido, Inscripcion, PerfilJugador,Reporte,MensajeChat
 from .forms import PerfilJugadorForm
 
 def home(request):
@@ -116,12 +116,14 @@ def elegir_formacion(request, partido_id):
     ocupados_a = Inscripcion.objects.filter(partido=partido, equipo='A').values_list('posicion_numero', flat=True)
     ocupados_b = Inscripcion.objects.filter(partido=partido, equipo='B').values_list('posicion_numero', flat=True)
 
+    mi_inscripcion = Inscripcion.objects.filter(partido=partido, usuario=request.user).first()
     context = {
         'partido': partido,
         'rango_equipo': rango_equipo,
         'ocupados_a': ocupados_a,
         'ocupados_b': ocupados_b,
         'ya_inscrito': ya_inscrito,
+        'mi_inscripcion': mi_inscripcion,
     }
     return render(request, 'elegir_formacion.html', context)
 
@@ -166,3 +168,30 @@ def enviar_reporte(request, partido_id=None):
 def ver_ranking(request):
     jugadores = PerfilJugador.objects.all().order_by('-puntos')
     return render(request, 'ranking.html', {'ranking': jugadores})
+
+@login_required
+def chat_partido(request, partido_id):
+    partido = get_object_or_404(Partido, id=partido_id)
+
+    inscripcion = Inscripcion.objects.filter(partido=partido, usuario=request.user).first()
+
+    if not inscripcion:
+        return redirect('home')
+    if request.method == 'POST':
+        contenido = request.POST.get('mensaje')
+        if contenido:
+            MensajeChat.objects.create(
+                partido=partido,
+                usuario=request.user,
+                contenido=contenido,
+                equipo=inscripcion.equipo
+            )
+        return redirect('chat_partido', partido_id=partido.id)
+
+    mensajes = MensajeChat.objects.filter(partido=partido, equipo=inscripcion.equipo)
+
+    return render(request, 'chat.html', {
+        'partido': partido,
+        'mensajes': mensajes,
+        'mi_equipo': inscripcion.equipo
+    })

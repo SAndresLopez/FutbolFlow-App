@@ -15,6 +15,7 @@ urlpatterns = [
     path('partido/<int:partido_id>/eliminar_inscripcion/', views.eliminar_inscripcion, name='eliminar_inscripcion'),
     path('reportar/', views.enviar_reporte, name='enviar_reporte'),
     path('ranking/', views.ver_ranking, name='ranking'),
+    path('partido/<int:partido_id>/chat/', views.chat_partido, name='chat_partido'),
 ]
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
