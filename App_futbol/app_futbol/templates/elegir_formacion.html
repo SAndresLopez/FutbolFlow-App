@@ -2,9 +2,23 @@
 
 {% block content %}
 <div class="container py-5">
+
     <div class="card bg-dark text-white border-secondary shadow-lg">
         <div class="card-header text-center border-secondary py-3">
             <h2 class="text-info fw-bold">{{ partido.nombre_encuentro }}</h2>
+
+            {% if ya_inscrito %}
+                <div class="alert alert-info d-inline-block py-1 px-3 mt-2 small">
+                    <i class="fas fa-check-circle me-2"></i>Ya estás anotado en este partido
+                </div>
+                <div class="mt-2">
+                    <a href="{% url 'eliminar_inscripcion' partido.id %}" class="btn btn-danger btn-sm shadow-sm">
+                        <i class="fas fa-user-minus me-2"></i>Eliminar inscripcion
+                    </a>
+                </div>
+            {% else %}
+                <p class="text-muted small">Selecciona una posición para unirte al equipo</p>
+            {% endif %}
         </div>
 
         <div class="card-body p-4">
@@ -16,7 +30,6 @@
                         {% for pos in rango_equipo %}
                             <div class="text-center" style="width: 80px;">
                                 {% if pos in ocupados_a %}
-                                    {# Usando related_name='Inscripcion' segun tu models.py #}
                                     {% for ins in partido.Inscripcion.all %}
                                         {% if ins.equipo == 'A' and ins.posicion_numero == pos %}
                                             <i class="fas fa-tshirt fa-3x text-info"></i>
@@ -30,10 +43,17 @@
                                         {% endif %}
                                     {% endfor %}
                                 {% else %}
-                                    <a href="{% url 'inscribirse' partido.id 'A' pos %}" class="text-secondary text-decoration-none hover-bright">
-                                        <i class="fas fa-tshirt fa-3x opacity-25"></i>
-                                        <p class="small mt-1">Libre</p>
-                                    </a>
+                                    {% if ya_inscrito %}
+                                        <div class="text-secondary opacity-25" style="cursor: not-allowed;">
+                                            <i class="fas fa-tshirt fa-3x"></i>
+                                            <p class="small mt-1">Libre</p>
+                                        </div>
+                                    {% else %}
+                                        <a href="{% url 'inscribirse' partido.id 'A' pos %}" class="text-secondary text-decoration-none hover-bright">
+                                            <i class="fas fa-tshirt fa-3x opacity-25"></i>
+                                            <p class="small mt-1">Libre</p>
+                                        </a>
+                                    {% endif %}
                                 {% endif %}
                             </div>
                         {% endfor %}
@@ -59,10 +79,17 @@
                                         {% endif %}
                                     {% endfor %}
                                 {% else %}
-                                    <a href="{% url 'inscribirse' partido.id 'B' pos %}" class="text-secondary text-decoration-none hover-bright">
-                                        <i class="fas fa-tshirt fa-3x opacity-25"></i>
-                                        <p class="small mt-1">Libre</p>
-                                    </a>
+                                    {% if ya_inscrito %}
+                                        <div class="text-secondary opacity-25" style="cursor: not-allowed;">
+                                            <i class="fas fa-tshirt fa-3x"></i>
+                                            <p class="small mt-1">Libre</p>
+                                        </div>
+                                    {% else %}
+                                        <a href="{% url 'inscribirse' partido.id 'B' pos %}" class="text-secondary text-decoration-none hover-bright">
+                                            <i class="fas fa-tshirt fa-3x opacity-25"></i>
+                                            <p class="small mt-1">Libre</p>
+                                        </a>
+                                    {% endif %}
                                 {% endif %}
                             </div>
                         {% endfor %}

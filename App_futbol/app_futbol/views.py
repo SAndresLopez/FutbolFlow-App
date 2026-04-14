@@ -103,6 +103,11 @@ def editar_perfil(request):
 
 def elegir_formacion(request, partido_id):
     partido = get_object_or_404(Partido, id=partido_id)
+
+    ya_inscrito = False
+    if request.user.is_authenticated:
+        ya_inscrito = Inscripcion.objects.filter(partido=partido, usuario=request.user).exists()
+
     cupos_por_equipo = partido.cupos_max // 2
     rango_equipo= range(1, cupos_por_equipo + 1)
 
@@ -114,15 +119,27 @@ def elegir_formacion(request, partido_id):
         'rango_equipo': rango_equipo,
         'ocupados_a': ocupados_a,
         'ocupados_b': ocupados_b,
+        'ya_inscrito': ya_inscrito,
     }
     return render(request, 'elegir_formacion.html', context)
 
 def inscribirse(request, partido_id, equipo, pos_num):
     partido = get_object_or_404(Partido, id=partido_id)
+    ya_inscrito = Inscripcion.objects.filter(partido=partido, usuario=request.user).exists()
+
+    if ya_inscrito:
+        return redirect('elegir_formacion', partido_id=partido.id)
+
     Inscripcion.objects.get_or_create(
         usuario=request.user,
         partido=partido,
         equipo=equipo,
         posicion_numero=pos_num
     )
+    return redirect('elegir_formacion', partido_id=partido.id)
+
+@login_required
+def eliminar_inscripcion(request, partido_id):
+    partido = get_object_or_404(Partido, id=partido_id)
+    Inscripcion.objects.filter(partido=partido, usuario=request.user).delete()
     return redirect('elegir_formacion', partido_id=partido.id)
