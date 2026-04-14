@@ -22,6 +22,37 @@
         </form>
     </div>
 
+    <div class="container mb-5">
+        <div class="row">
+            <div class="col-12 text-center mb-4">
+                <h2 class="text-white" style="font-family: 'Montserrat', sans-serif; font-weight: 800; letter-spacing: -1px;">
+                    TOP 3 <span style="color: #00d4ff;">LEYENDAS</span>
+                </h2>
+            </div>
+            {% for jugador in top_ranking %}
+            <div class="col-md-4 mb-3">
+                <div class="stat-card p-3 shadow-sm" style="background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(0, 212, 255, 0.3);">
+                    <div style="font-size: 2rem; margin-bottom: 10px;">
+                        {% if forloop.counter == 1 %}🥇{% elif forloop.counter == 2 %}🥈{% else %}🥉{% endif %}
+                    </div>
+                    <h5 class="fw-bold text-white mb-1">{{ jugador.usuario.username }}</h5>
+                    <div class="ranking-stars mb-2">
+                        <span class="text-warning">{{ jugador.estrellas }} <i class="fas fa-star"></i></span>
+                    </div>
+                    <div class="badge bg-info text-dark fw-bold" style="font-size: 0.9rem;">
+                        {{ jugador.puntos }} PTS
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+            <div class="col-12 text-center mt-2">
+                <a href="{% url 'ranking' %}" class="btn btn-link text-info fw-bold text-decoration-none">
+                    Ver tabla completa <i class="fas fa-arrow-right ms-1"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+
     <div class="match-grid">
         <div class="row">
             <div class="col-md-8">
@@ -56,7 +87,7 @@
                                     <i class="fa{% if r >= 4 %}s{% elif r >= 3.5 %}s fa-star-half-alt{% else %}r{% endif %} fa-star"></i>
                                     <i class="fa{% if r >= 5 %}s{% elif r >= 4.5 %}s fa-star-half-alt{% else %}r{% endif %} fa-star"></i>
                                 {% endwith %}
-                                <span class="text-info small ms-1">({{ perfil.ranking }})</span>
+                                <span class="text-info small ms-1">({{ perfil.estrellas }})</span>
                             </div>
                         </div>
 
