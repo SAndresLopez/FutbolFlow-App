@@ -9,6 +9,8 @@ from .forms import PerfilJugadorForm
 
 def home(request):
     partidos = Partido.objects.all()
+    top_ranking = PerfilJugador.objects.all().order_by('-puntos')[:3]
+
     perfil = None
     if request.user.is_authenticated:
         try:
@@ -20,7 +22,8 @@ def home(request):
 
     context = {
         'partidos': partidos,
-        'perfil': perfil
+        'perfil': perfil,
+        'top_ranking': top_ranking,
     }
     return render(request, 'home.html', context)
 
@@ -159,3 +162,7 @@ def enviar_reporte(request, partido_id=None):
         return redirect('home')
 
     return render(request, 'enviar_reporte.html', {'partido_id': partido_id})
+
+def ver_ranking(request):
+    jugadores = PerfilJugador.objects.all().order_by('-puntos')
+    return render(request, 'ranking.html', {'ranking': jugadores})

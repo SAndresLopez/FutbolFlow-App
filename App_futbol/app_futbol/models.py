@@ -52,9 +52,10 @@ class PerfilJugador(models.Model):
     telefono = models.CharField(max_length=15, blank=True)
     distrito = models.CharField(max_length=50, blank=True)
     posicion = models.CharField(max_length=50, choices=POSICIONES, default='Mediocampista')
-    ranking = models.DecimalField(max_digits=3, decimal_places=2, default=5.0)
+    estrellas = models.DecimalField(max_digits=3, decimal_places=2, default=5.0)
     partidos_jugados = models.IntegerField(default=0)
     foto = models.ImageField(upload_to='perfiles/', null=True, blank=True, verbose_name="Foto de Crack")
+    puntos = models.IntegerField(default=0)
 
     class Meta:
         verbose_name = "Perfil de Jugador"
@@ -112,3 +113,12 @@ class Reporte(models.Model):
     def save(self, *args, **kwargs):
         self.descripcion = limpiar_texto(self.descripcion)
         super().save(*args, **kwargs)
+
+class Ranking(models.Model):
+    jugador = models.OneToOneField('PerfilJugador', on_delete=models.CASCADE)
+    puntos = models.IntegerField(default=0)
+    partidos_jugados = models.IntegerField(default=0)
+    nivel = models.CharField(max_length=20, default='Bronce')
+
+    class Meta:
+        ordering = ['-puntos']
