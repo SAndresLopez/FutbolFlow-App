@@ -50,9 +50,14 @@ class PerfilJugador(models.Model):
 
 
 class Inscripcion(models.Model):
-    partido = models.ForeignKey(Partido, on_delete=models.CASCADE, related_name='inscripciones')
-    usuario = models.CharField(max_length=100)
+    partido = models.ForeignKey(Partido, on_delete=models.CASCADE, related_name='Inscripcion')
+    usuario = models.ForeignKey(User, on_delete=models.CASCADE, related_name='mis_inscripciones')
     fecha_inscripcion = models.DateTimeField(auto_now_add=True)
+    equipo = models.CharField(max_length=1, choices=[('A', 'Equipo A'), ('B', 'Equipo B')])
+    posicion_numero = models.IntegerField()
+
+    class Meta:
+        unique_together = ('partido', 'equipo', 'posicion_numero')
 
     def __str__(self):
-        return f"{self.nombre_jugador} en {self.partido.nombre_encuentro}"
+        return f"{self.usuario} en {self.partido.nombre_encuentro}"

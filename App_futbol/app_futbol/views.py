@@ -100,3 +100,29 @@ def editar_perfil(request):
         form = PerfilJugadorForm(instance=perfil)
 
     return render(request, 'editar_perfil.html', {'form': form})
+
+def elegir_formacion(request, partido_id):
+    partido = get_object_or_404(Partido, id=partido_id)
+    cupos_por_equipo = partido.cupos_max // 2
+    rango_equipo= range(1, cupos_por_equipo + 1)
+
+    ocupados_a = Inscripcion.objects.filter(partido=partido, equipo='A').values_list('posicion_numero', flat=True)
+    ocupados_b = Inscripcion.objects.filter(partido=partido, equipo='B').values_list('posicion_numero', flat=True)
+
+    context = {
+        'partido': partido,
+        'rango_equipo': rango_equipo,
+        'ocupados_a': ocupados_a,
+        'ocupados_b': ocupados_b,
+    }
+    return render(request, 'elegir_formacion.html', context)
+
+def inscribirse(request, partido_id, equipo, pos_num):
+    partido = get_object_or_404(Partido, id=partido_id)
+    Inscripcion.objects.get_or_create(
+        usuario=request.user,
+        partido=partido,
+        equipo=equipo,
+        posicion_numero=pos_num
+    )
+    return redirect('elegir_formacion', partido_id=partido.id)

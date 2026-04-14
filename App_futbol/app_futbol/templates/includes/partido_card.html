@@ -38,10 +38,8 @@
                     <span class="amount">{{ partido.precio }}</span>
                 </div>
                 {% if user.is_authenticated %}
-                    <a href="{% url 'unirse_partido' partido.id %}" class="btn-book-link">
-                        <button class="btn-book">
-                            {% if partido.cupos_restantes == 0 %}Lleno{% else %}Unirme{% endif %}
-                        </button>
+                    <a href="{% url 'elegir_formacion' partido.id %}" class="btn-book">
+                        Unirme
                     </a>
                 {% else %}
                     <a href="{% provider_login_url 'google' %}" class="btn-book-link">
