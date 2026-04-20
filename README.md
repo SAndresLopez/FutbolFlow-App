@@ -1,13 +1,25 @@
-# Aprendizaje Python
+# ⚽ App_futbol - Plataforma de Gestión Deportiva
 
-Mi camino de aprendizaje en Python, desde logica basica hasta APIs profesionales.
+Una aplicación web robusta construida con **Django** y **MySQL** diseñada para digitalizar la gestión de equipos de fútbol, estadísticas de jugadores y comunicación interna.
 
-## Contenido del Repo
-* **/biblioteca_fastapi**: Proyecto de API REST con FastAPI, SQLAlchemy y migraciones con Alembic.
-* **/ejercicios_logica**: Retos y algoritmos resueltos.
+## 🚀 Características Principales
+* **Ranking "Top Legends":** Algoritmo personalizado para calcular y mostrar a los mejores jugadores.
+* **Chat Privado por Equipos:** Sistema de mensajería seguro restringido a miembros para evitar toxicidad.
+* **Estética Cyberpunk/Neon:** Interfaz moderna con efectos de brillo y paleta azul/magenta.
+* **Gestión Integral:** Registro de partidos, resultados y perfiles de jugadores.
 
-## Tecnologias
-* Python 3.x
-* FastAPI
-* SQLite / SQLAlchemy
-* Alembic
+## 🛠️ Stack Tecnológico
+* **Backend:** Python 3.10+, Django 4.x
+* **Base de Datos:** MySQL
+* **Frontend:** HTML5, CSS3, Bootstrap
+
+## 📂 Contenido del Repo
+* **/App_futbol:** Proyecto principal de gestión deportiva.
+* **/biblioteca_fastapi:** API REST con FastAPI y SQLAlchemy.
+* **/ejercicios_logica:** Retos y algoritmos resueltos.
+
+## 📦 Instalación rápida
+1. `git clone https://github.com/SAndresLopez/Aprendizaje-python-logica.git`
+2. `pip install -r requirements.txt`
+3. `python manage.py migrate`
+4. `python manage.py runserver`
